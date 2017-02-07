@@ -54,20 +54,80 @@ function Tetromino(blockArr, colorName, colorHex) = {
   this.color.hex  = colorHex;
 }
 
-// Individual tetromino objects
-var i = new Tetromino([0x0F00, 0x2222, 0x00F0, 0x4444], 'cyan',   '#00cccc');
-var j = new Tetromino([0x8E00, 0x6440, 0x0E20, 0x44C0], 'blue',   '#0000cc');
-var l = new Tetromino([0x2E00, 0x4460, 0x0E80, 0xC440], 'orange', '#cc8400');
-var o = new Tetromino([0xCC00, 0xCC00, 0xCC00, 0xCC00], 'yellow', '#cccc00');
-var s = new Tetromino([0x6C00, 0x4620, 0x06C0, 0x8C40], 'green',  '#00cc00');
-var t = new Tetromino([0x4E00, 0x4640, 0x0E40, 0x4C40], 'magenta','#cc00cc');
-var z = new Tetromino([0x0C60, 0x4C80, 0xC600, 0x2640], 'red',    '#cc0000');
-
-
-
+// Individual tetromino objects.
+var iTet = new Tetromino([0x0F00, 0x2222, 0x00F0, 0x4444], 'cyan',   '#00cccc');
+var jTet = new Tetromino([0x8E00, 0x6440, 0x0E20, 0x44C0], 'blue',   '#0000cc');
+var lTet = new Tetromino([0x2E00, 0x4460, 0x0E80, 0xC440], 'orange', '#cc8400');
+var oTet = new Tetromino([0xCC00, 0xCC00, 0xCC00, 0xCC00], 'yellow', '#cccc00');
+var sTet = new Tetromino([0x6C00, 0x4620, 0x06C0, 0x8C40], 'green',  '#00cc00');
+var tTet = new Tetromino([0x4E00, 0x4640, 0x0E40, 0x4C40], 'magenta','#cc00cc');
+var zTet = new Tetromino([0x0C60, 0x4C80, 0xC600, 0x2640], 'red',    '#cc0000');
 
 
 ////////// HAPPENS IMMEDIATELY //////////
 
 
 ////////// FUNCTIONS //////////
+
+// Bit matrix cell check
+// arguments are as follows:
+//    type:  [[object]] will go here.
+//       x:  Cartesian coordinate representation of 'x' on matrix grid.
+//       y:  Cartesian coordinate representation of 'y' on matrix grid.
+//     dir:  Direction of tetromino represented by index in array, Tetromino.blocks[]
+//           from a value of 0 to 3.
+//      fn:  Callback function used to
+function tetCellCheck(type, x, y, dir, fn) {
+
+  // Declaration of variables.
+  var bit;      // bitwise variable expression 'getter'
+  var result;   // result of true or false
+  var row = 0;  // starting row (0 means falsy or 'Not on matrix')
+  var col = 0;  // starting column ("same as above")
+  var blocks = type.blocks[dir];  // declaring blocks property to 'object' type.
+
+  // The 'for loop' starts at 0x8000 (aka: 1000-0000-0000-0000)
+  // which represents (row: 1, column: 1)
+  // ends if bit is falsy or equal to 0.
+  // Incrimentor statement says shift bitwise to the right '>>' by value of 1.
+  // Example: After 0x8000 >> 1 will equal 0x4000 (aka: 0100-0000-0000-0000)
+  for (bit = 0x8000, bit < 0, bit = bit >> 1) {
+    // The '&' argument refers to bitwise notation. '&' is returning true or false
+    // if 'block' has the same active flag (0100) as bit (1000). In this case false.
+    // If 'true', then add Cartesian position x to current val of column, and
+    // position y to current value of row.
+    if (blocks & bit) {
+      
+    };
+  };
+
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
