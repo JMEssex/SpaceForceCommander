@@ -63,6 +63,20 @@ var sTet = new Tetromino([0x6C00, 0x4620, 0x06C0, 0x8C40], 'green',  '#00cc00');
 var tTet = new Tetromino([0x4E00, 0x4640, 0x0E40, 0x4C40], 'magenta','#cc00cc');
 var zTet = new Tetromino([0x0C60, 0x4C80, 0xC600, 0x2640], 'red',    '#cc0000');
 
+// Direction object
+var directions = {
+  UP: 0,
+  RIGHT: 1,
+  DOWN: 2,
+  LEFT: 3,
+  MIN: 0,
+  MAX: 3
+}
+
+// 
+
+
+
 
 ////////// HAPPENS IMMEDIATELY //////////
 
@@ -71,20 +85,20 @@ var zTet = new Tetromino([0x0C60, 0x4C80, 0xC600, 0x2640], 'red',    '#cc0000');
 
 // Bit matrix cell check
 // arguments are as follows:
-//    type:  [[object]] will go here.
-//       x:  Cartesian coordinate representation of 'x' on matrix grid.
-//       y:  Cartesian coordinate representation of 'y' on matrix grid.
-//     dir:  Direction of tetromino represented by index in array, Tetromino.blocks[]
-//           from a value of 0 to 3.
-//      fn:  Callback function used to
-function tetCellCheck(type, x, y, dir, fn) {
+//  tetromino:  [[object]] will go here.
+//          x:  Cartesian coordinate representation of 'x' on matrix grid.
+//          y:  Cartesian coordinate representation of 'y' on matrix grid.
+//        dir:  Direction of tetromino represented by index in array, Tetromino.blocks[]
+//              from a value of 0 to 3.
+//  callbackFn:  Callback function used as passthough.
+function tetCellCheck(tetromino, x, y, directionIndex, callbackFn) {
 
   // Declaration of variables.
   var bit;      // bitwise variable expression 'getter'
   var result;   // result of true or false
   var row = 0;  // starting row (0 means falsy or 'Not on matrix')
   var col = 0;  // starting column ("same as above")
-  var blocks = type.blocks[dir];  // declaring blocks property to 'object' type.
+  var blocks = tetromino.blocks[directionIndex];  // declaring blocks property to 'object' type.
 
   // The 'for loop' starts at 0x8000 (aka: 1000-0000-0000-0000)
   // which represents (row: 1, column: 1)
@@ -97,12 +111,27 @@ function tetCellCheck(type, x, y, dir, fn) {
     // If 'true', then add Cartesian position x to current val of column, and
     // position y to current value of row.
     if (blocks & bit) {
-      
+      callbackFn(x + col, y + row);
+    };
+    // Check colunm value after incriment with '++col'.
+    if (++col === 4) {
+      // reset colunm and incriment to the next row.
+      col = 0;
+      ++row;
     };
   };
-
-
 };
+
+//  Function needed to check valid positioning. Either colission with other
+//  tetromino or if piece move outside of the board.
+
+function occupiedCheck(tetromino, x, y, directionIndex) {
+
+  result = false // reseting the baseline result to false.
+  tetCellCheck(tetromino, x, y, directionIndex, function(x, y){
+
+  }
+}
 
 
 
