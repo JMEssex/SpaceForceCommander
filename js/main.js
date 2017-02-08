@@ -91,9 +91,28 @@ const KEYSTROKES = {
   SPACE: 32
 }
 
-//
+// Canvas variables
+var canvas = document.getElementById('main-canvas'); // Common getter
+var ctx    = canvas.getContext('2d'); // ctx common variable
+var speed  = {
+  start: 0.6,       // 0.6 seconds
+  decrement: 0.005, // Object will drop
+  min: 0.1          // Object minimum that can drop will be .1
+}
 
+var maxWidth  = 10; // refering to the canvas being seperated into 10 columns.
+var maxHeight = 20; // refering to the canvas being seperated into 20 rows.
+var cells           // refering to individual cells of (maxwidth x maxHeight) 2d Cartesian grid.
 
+var xCell           // width of a single tetromino pixel
+var yCell           // height of a single tetromino pixel
+var action          // User recognition of KEYSTROKES occuring.
+var playing         // User is actively in a game.
+var timeDuration    // Time passed from game start.
+var currentTet      // Current Tetromino in play.
+var nextTet         // Next Tetromino in queue.
+var rows            // How many rows were eleminated per game
+var dropTime        // Time interval between tetromino lowering by one line.
 
 
 ////////// HAPPENS IMMEDIATELY //////////
@@ -142,16 +161,51 @@ function tetCellCheck(tetromino, x, y, directionIndex, callbackFn) {
 
 //  Function needed to check valid positioning. Either colission with other
 //  tetromino or if piece move outside of the board.
+function occupiedCheck(tetromino, x, y, directionIndex) {
 
-// function occupiedCheck(tetromino, x, y, directionIndex) {
-//
-//   result = false // reseting the baseline result to false.
-//
-//   tetCellCheck(tetromino, x, y, directionIndex, function(x, y)){
-//
-//   }
-// }
+  result = false; // reseting the baseline result to false.
 
+  tetCellCheck(tetromino, x, y, directionIndex, function(x, y) {
+
+    // Checking condition if the tetromino is outside the x & y range.
+    // this 'if' statement requests x or y are less than 0 or greater than the max.
+    // the function occupiedFlag represents a boolean value of true (occupied) or false (empty)
+    if ( (x < 0) || (x >= maxWidth) || (y < 0) || (y >= maxHeight) || occupiedFlag(x, y) ){
+      result = true; // true means position is occupied.
+    };
+
+    return result;
+  });
+};
+
+//  Check if tetromino is not occupied by another piece.
+function unoccupiedCheck (tetromino, x, y, directionIndex) {
+  // returning opposite of 'return result' from occupiedCheck function.
+  return !occupiedCheck (tetromino, x, y, directionIndex)
+}
+
+//  Creating a score global variable and validation checker.
+function setScore(num) {
+  score = num;
+  invalidateScore();
+}
+
+//  Score addition function to itself.
+function addScore(num) {
+  score += num
+}
+
+// function setRows(n)             { rows = n; step = Math.max(speed.min, speed.start - (speed.decrement*rows)); invalidateRows(); };
+function setRows(num) {
+  rows = num;
+  //  Steps is returning the higest of values 
+  steps = Math.max(speed.min, speed.start - (speed.decrement * rows) )
+}
+// function addRows(n)             { setRows(rows + n); };
+// function getBlock(x,y)          { return (blocks && blocks[x] ? blocks[x][y] : null); };
+// function setBlock(x,y,type)     { blocks[x] = blocks[x] || []; blocks[x][y] = type; invalidate(); };
+// function setCurrentPiece(piece) { current = piece || randomPiece(); invalidate();     };
+// function setNextPiece(piece)    { next    = piece || randomPiece(); invalidateNext(); };
 
 
 
