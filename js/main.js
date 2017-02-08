@@ -48,10 +48,11 @@
 
 
 // Constructor function for tetrominoes.
-function Tetromino(blockArr, colorName, colorHex) = {
+function Tetromino(blockArr, colorName, colorHex) {
   this.blocks = blockArr;
+  this.color = new Object();
   this.color.name = colorName;
-  this.color.hex  = colorHex;
+  this.color.hex = colorHex;
 }
 
 // Individual tetromino objects.
@@ -63,8 +64,15 @@ var sTet = new Tetromino([0x6C00, 0x4620, 0x06C0, 0x8C40], 'green',  '#00cc00');
 var tTet = new Tetromino([0x4E00, 0x4640, 0x0E40, 0x4C40], 'magenta','#cc00cc');
 var zTet = new Tetromino([0x0C60, 0x4C80, 0xC600, 0x2640], 'red',    '#cc0000');
 
-// Direction object
-var directions = {
+// Tetromino Array
+var tetArr = [iTet, jTet, lTet, oTet, sTet, tTet, zTet];
+
+// Random Tetromino Pice from array.
+var nextPiece = tetArr[Math.floor(Math.random() * tetArr.length)];
+// var nextPiece = tetArr[Math.round(Math.random(0, tetArr.length-1))];
+
+// Direction Constant Object
+const DIRECTIONS = {
   UP: 0,
   RIGHT: 1,
   DOWN: 2,
@@ -73,7 +81,17 @@ var directions = {
   MAX: 3
 }
 
-// 
+// Keystrokes Constant Object
+const KEYSTROKES = {
+  LEFT: 37,
+  UP: 38,
+  RIGHT: 39,
+  DOWN: 40,
+  ESC: 27,
+  SPACE: 32
+}
+
+//
 
 
 
@@ -105,7 +123,7 @@ function tetCellCheck(tetromino, x, y, directionIndex, callbackFn) {
   // ends if bit is falsy or equal to 0.
   // Incrimentor statement says shift bitwise to the right '>>' by value of 1.
   // Example: After 0x8000 >> 1 will equal 0x4000 (aka: 0100-0000-0000-0000)
-  for (bit = 0x8000, bit < 0, bit = bit >> 1) {
+  for (bit = 0x8000; bit < 0; bit = bit >> 1) {
     // The '&' argument refers to bitwise notation. '&' is returning true or false
     // if 'block' has the same active flag (0100) as bit (1000). In this case false.
     // If 'true', then add Cartesian position x to current val of column, and
@@ -125,13 +143,14 @@ function tetCellCheck(tetromino, x, y, directionIndex, callbackFn) {
 //  Function needed to check valid positioning. Either colission with other
 //  tetromino or if piece move outside of the board.
 
-function occupiedCheck(tetromino, x, y, directionIndex) {
-
-  result = false // reseting the baseline result to false.
-  tetCellCheck(tetromino, x, y, directionIndex, function(x, y){
-
-  }
-}
+// function occupiedCheck(tetromino, x, y, directionIndex) {
+//
+//   result = false // reseting the baseline result to false.
+//
+//   tetCellCheck(tetromino, x, y, directionIndex, function(x, y)){
+//
+//   }
+// }
 
 
 
