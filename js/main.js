@@ -184,6 +184,8 @@ function unoccupiedCheck (tetromino, x, y, directionIndex) {
   return !occupiedCheck (tetromino, x, y, directionIndex)
 }
 
+
+
 //  Creating a score global variable and validation checker.
 function setScore(num) {
   score = num;
@@ -195,18 +197,52 @@ function addScore(num) {
   score += num
 }
 
-// function setRows(n)             { rows = n; step = Math.max(speed.min, speed.start - (speed.decrement*rows)); invalidateRows(); };
 function setRows(num) {
   rows = num;
-  //  Steps is returning the higest of values 
-  steps = Math.max(speed.min, speed.start - (speed.decrement * rows) )
+  //  Steps is returning the higest of values. Either the speed min or starting
+  //  speed minus the decrementor set before in the speed object multplied by the level.
+  steps = Math.max(speed.min, speed.start - (speed.decrement * rows));
+  //  This refers to the valadation flag.
+  invalidateRows()
 }
-// function addRows(n)             { setRows(rows + n); };
-// function getBlock(x,y)          { return (blocks && blocks[x] ? blocks[x][y] : null); };
-// function setBlock(x,y,type)     { blocks[x] = blocks[x] || []; blocks[x][y] = type; invalidate(); };
-// function setCurrentPiece(piece) { current = piece || randomPiece(); invalidate();     };
-// function setNextPiece(piece)    { next    = piece || randomPiece(); invalidateNext(); };
 
+function addRows(num) {
+  setRows(rows + num);
+}
+
+function occupiedFlag(x, y){
+  if (cells && cells[x]){
+    return cells[x][y]
+  } else {
+    return null;
+  }
+}
+
+function setTetromino(x, y, tetromino) {
+  cells[x] = cells[x] || [];
+  cells [x][y] = tetromino;
+  invalidate();
+}
+
+function setCurrentTetromino(tetromino) {
+  currentTet = tetromino || tetArr[nextPiece];
+  invalidate();
+}
+
+function setNextPiece(tetromino) {
+  nextTet = tetromino || tetArr[nextPiece]
+  invalidateNext();
+}
+
+var last = now = timestamp();
+function frame() {
+  now = timestamp();
+  update((now - last) / 1000.0);
+  draw();
+  last = now;
+  requestAnimationFrame(frame, canvas);
+}
+frame(); // start the first frame
 
 
 
