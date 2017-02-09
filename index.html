@@ -6,16 +6,25 @@
     <title>Code Word: Project Tetromino</title>
     <link rel="stylesheet" href="./css/master.css">
     <script
-      src="http://code.jquery.com/jquery-3.1.1.min.js"
+      src="https://code.jquery.com/jquery-3.1.1.min.js"
       integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
       crossorigin="anonymous">
     </script>
 
   </head>
   <body>
-    <section id="main-board">
+    <div class="start-menu">
+      <div class="start">
+        <button id="start-button"type="button" name="start-button">Click to Start</button>
+        <p><canvas id="upcoming"></canvas></p>
+        <p>score <span id="score">00000</span></p>
+        <p>rows <span id="rows">0</span></p>
+      </div>
+
+    </div>
+    <div id="main-board">
       <canvas id="main-canvas">If you want to play my tetris game, Do yourself a favor. Download Chrome.</canvas>
-    </section>
+    </div>
     <script src="./js/main.js" charset="utf-8"></script>
   </body>
 </html>

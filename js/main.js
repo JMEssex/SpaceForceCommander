@@ -48,7 +48,8 @@
 
 
 // Constructor function for tetrominoes.
-function Tetromino(blockArr, colorName, colorHex) {
+function Tetromino(tetSize, blockArr, colorName, colorHex) {
+  this.size = tetSize;
   this.blocks = blockArr;
   this.color = new Object();
   this.color.name = colorName;
@@ -56,20 +57,24 @@ function Tetromino(blockArr, colorName, colorHex) {
 }
 
 // Individual tetromino objects.
-var iTet = new Tetromino([0x0F00, 0x2222, 0x00F0, 0x4444], 'cyan',   '#00cccc');
-var jTet = new Tetromino([0x8E00, 0x6440, 0x0E20, 0x44C0], 'blue',   '#0000cc');
-var lTet = new Tetromino([0x2E00, 0x4460, 0x0E80, 0xC440], 'orange', '#cc8400');
-var oTet = new Tetromino([0xCC00, 0xCC00, 0xCC00, 0xCC00], 'yellow', '#cccc00');
-var sTet = new Tetromino([0x6C00, 0x4620, 0x06C0, 0x8C40], 'green',  '#00cc00');
-var tTet = new Tetromino([0x4E00, 0x4640, 0x0E40, 0x4C40], 'magenta','#cc00cc');
-var zTet = new Tetromino([0x0C60, 0x4C80, 0xC600, 0x2640], 'red',    '#cc0000');
+var iTet = new Tetromino(4, [0x0F00, 0x2222, 0x00F0, 0x4444], 'cyan',   '#00cccc');
+var jTet = new Tetromino(3, [0x8E00, 0x6440, 0x0E20, 0x44C0], 'blue',   '#0000cc');
+var lTet = new Tetromino(3, [0x2E00, 0x4460, 0x0E80, 0xC440], 'orange', '#cc8400');
+var oTet = new Tetromino(2, [0xCC00, 0xCC00, 0xCC00, 0xCC00], 'yellow', '#cccc00');
+var sTet = new Tetromino(3, [0x6C00, 0x4620, 0x06C0, 0x8C40], 'green',  '#00cc00');
+var tTet = new Tetromino(3, [0x4E00, 0x4640, 0x0E40, 0x4C40], 'magenta','#cc00cc');
+var zTet = new Tetromino(3, [0x0C60, 0x4C80, 0xC600, 0x2640], 'red',    '#cc0000');
 
 // Tetromino Array
 var tetArr = [iTet, jTet, lTet, oTet, sTet, tTet, zTet];
 
-// Random Tetromino Pice from array.
-var nextPiece = tetArr[Math.floor(Math.random() * tetArr.length)];
-// var nextPiece = tetArr[Math.round(Math.random(0, tetArr.length-1))];
+// Function to access random tetromino.
+function randomPiece() {
+  // Random Tetromino from array.
+  var nextPiece = tetArr[Math.floor(Math.random() * tetArr.length)];
+  return { tetromino: nextPiece, direction: DIRECTIONS.UP, x: 5, y: 0 };
+}
+
 
 // Direction Constant Object
 const DIRECTIONS = {
@@ -113,6 +118,8 @@ var currentTet      // Current Tetromino in play.
 var nextTet         // Next Tetromino in queue.
 var rows            // How many rows were eleminated per game
 var dropTime        // Time interval between tetromino lowering by one line.
+
+
 
 
 ////////// HAPPENS IMMEDIATELY //////////
@@ -184,7 +191,107 @@ function unoccupiedCheck (tetromino, x, y, directionIndex) {
   return !occupiedCheck (tetromino, x, y, directionIndex)
 }
 
+var invalid = new Object();
 
+function invalidate(){
+  invalidate.board = true
+}
+
+function invalidateNext(){
+  invalid.next = true;
+}
+
+function invalidateScore(){
+  invalid.score = true;
+}
+
+function invalidateRows(){
+  invalid.rows = true;
+}
+
+function drawCell(ctx, x, y, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(x * xCell, y * yCell, xCell, yCell);
+  ctx.strokeRect(x * xCell, y * yCell, xCell, yCell);
+}
+
+function drawTetromino(ctx, tetromino, x, y, directionIndex) {
+  tetCellCheck(tetromino, x, y, directionIndex, callbackFn) {
+    drawCell(ctx, x, y, tetromino.color)
+  }
+}
+
+function drawRows() {
+  if (invalid.rows) {
+    $('#rows').html(rows);
+    invalid.rows = false;
+  }
+}
+
+function draw() {
+  ctx.save()
+  ctx.lineWidth = 1;
+  ctx.translate(0.5, 0.5);
+  drawCourt()
+}
+
+function drawCourt() {
+  if (invalid.court) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (playing) {
+      drawPiece(ctx, currentTet.tetromino, currentTet.x, currentTet.y, currentTet.directionIndex)
+    }
+  }
+}
+
+
+// function drawCourt() {
+//   if (invalid.court) {
+//     ctx.clearRect(0, 0, canvas.width, canvas.height);
+//     if (playing)
+//       drawPiece(ctx, current.type, current.x, current.y, current.dir);
+//     var x, y, block;
+//     for(y = 0 ; y < ny ; y++) {
+//       for (x = 0 ; x < nx ; x++) {
+//         if (block = getBlock(x,y))
+//           drawBlock(ctx, x, y, block.color);
+//       }
+//     }
+//     ctx.strokeRect(0, 0, nx*dx - 1, ny*dy - 1); // court boundary
+//     invalid.court = false;
+//   }
+// }
+
+// function draw() {
+//   ctx.save();
+//   ctx.lineWidth = 1;
+//   ctx.translate(0.5, 0.5); // for crisp 1px black lines
+//   drawCourt();
+//   drawNext();
+//   drawScore();
+//   drawRows();
+//   ctx.restore();
+// }
+//
+// function drawNext() {
+//   if (invalid.next) {
+//     var padding = (nu - next.type.size) / 2; // half-arsed attempt at centering next piece display
+//     uctx.save();
+//     uctx.translate(0.5, 0.5);
+//     uctx.clearRect(0, 0, nu*dx, nu*dy);
+//     drawPiece(uctx, next.type, padding, padding, next.dir);
+//     uctx.strokeStyle = 'black';
+//     uctx.strokeRect(0, 0, nu*dx - 1, nu*dy - 1);
+//     uctx.restore();
+//     invalid.next = false;
+//   }
+// }
+// function drawScore() {
+//   if (invalid.score) {
+//     html('score', ("00000" + Math.floor(vscore)).slice(-5));
+//     invalid.score = false;
+//   }
+// }
 
 //  Creating a score global variable and validation checker.
 function setScore(num) {
@@ -234,17 +341,24 @@ function setNextPiece(tetromino) {
   invalidateNext();
 }
 
-var last = now = timestamp();
-function frame() {
-  now = timestamp();
-  update((now - last) / 1000.0);
-  draw();
-  last = now;
-  requestAnimationFrame(frame, canvas);
+function timestamp() {
+  return new Date().getTime()
 }
-frame(); // start the first frame
 
+function startGame() {
 
+  var last = now = timestamp()
+  function frame() {
+    now = timestamp();
+    update((now - last) / 1000.0);
+    draw();
+    last = now;
+    requestAnimationFrame(frame, canvas);
+  }
+
+  frame(); // start the first frame
+
+}
 
 
 
