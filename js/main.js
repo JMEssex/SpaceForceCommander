@@ -105,9 +105,9 @@ var speed  = {
   min: 0.1          // Object minimum that can drop will be .1
 }
 
-var maxWidth  = 10; // refering to the canvas being seperated into 10 columns.
-var maxHeight = 20; // refering to the canvas being seperated into 20 rows.
-var cells           // refering to individual cells of (maxwidth x maxHeight) 2d Cartesian grid.
+var maxWidth  = 10; // reffering to the canvas being seperated into 10 columns.
+var maxHeight = 20; // reffering to the canvas being seperated into 20 rows.
+var cells           // reffering to individual cells of (maxwidth x maxHeight) 2d Cartesian grid.
 
 var xCell           // width of a single tetromino pixel
 var yCell           // height of a single tetromino pixel
@@ -142,7 +142,7 @@ function tetCellCheck(tetromino, x, y, directionIndex, callbackFn) {
   var result;   // result of true or false
   var row = 0;  // starting row (0 means falsy or 'Not on matrix')
   var col = 0;  // starting column ("same as above")
-  var blocks = tetromino.blocks[directionIndex];  // declaring blocks property to 'object' type.
+  var cells = tetromino.blocks[directionIndex];  // declaring blocks property to 'object' type.
 
   // The 'for loop' starts at 0x8000 (aka: 1000-0000-0000-0000)
   // which represents (row: 1, column: 1)
@@ -154,7 +154,7 @@ function tetCellCheck(tetromino, x, y, directionIndex, callbackFn) {
     // if 'block' has the same active flag (0100) as bit (1000). In this case false.
     // If 'true', then add Cartesian position x to current val of column, and
     // position y to current value of row.
-    if (blocks & bit) {
+    if (cells & bit) {
       callbackFn(x + col, y + row);
     };
     // Check colunm value after incriment with '++col'.
@@ -185,40 +185,43 @@ function occupiedCheck(tetromino, x, y, directionIndex) {
   });
 };
 
-//  Check if tetromino is not occupied by another piece.
+//  unoccupiedCheck is used to determin if a new spot for a tetromino is occupied after a tetromino movement has been set in queue, but before the board rendering.
 function unoccupiedCheck (tetromino, x, y, directionIndex) {
   // returning opposite of 'return result' from occupiedCheck function.
   return !occupiedCheck (tetromino, x, y, directionIndex)
 }
 
+//  Inorder to check if the tetromino is in a valid position we need to develop a set of functions to check for any issues.  These are just standard boolean flags to make sure that we are reseting functions after every action.
+// creating the new invalid object.
 var invalid = new Object();
 
-function invalidate(){
+//  reffering to if the board has been modified will be used to flag functions.
+function invalidateBoard(){
   invalidate.board = true
 }
 
-function invalidateNext(){
-  invalid.next = true;
-}
-
+//  reffering to the score update function as a flag.
 function invalidateScore(){
   invalid.score = true;
 }
 
+//
 function invalidateRows(){
   invalid.rows = true;
 }
 
+//  Standard draw function
 function drawCell(ctx, x, y, color) {
   ctx.fillStyle = color;
   ctx.fillRect(x * xCell, y * yCell, xCell, yCell);
   ctx.strokeRect(x * xCell, y * yCell, xCell, yCell);
 }
 
+//  Determining the tetromino as a valid positioning.
 function drawTetromino(ctx, tetromino, x, y, directionIndex) {
-  tetCellCheck(tetromino, x, y, directionIndex, callbackFn) {
+  tetCellCheck(tetromino, x, y, directionIndex, function(x, y) {
     drawCell(ctx, x, y, tetromino.color)
-  }
+  })
 }
 
 function drawRows() {
@@ -228,70 +231,39 @@ function drawRows() {
   }
 }
 
-function draw() {
-  ctx.save()
-  ctx.lineWidth = 1;
-  ctx.translate(0.5, 0.5);
-  drawCourt()
-}
-
 function drawCourt() {
+
   if (invalid.court) {
+    // command to clear from coordinate 0, 0 to full height & width.
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (playing) {
       drawPiece(ctx, currentTet.tetromino, currentTet.x, currentTet.y, currentTet.directionIndex)
     }
+    var x;
+    var y;
+    var cell;
+
+    for (y = 0; y < maxHeight; y++){
+      for (x = 0; x < maxWidth; x++){
+        cell = occupiedFlag(x, y)
+        if (true) {
+          drawCell(ctx, x, y, cell.color)
+        }
+      }
+    }
+    ctx.strokeRect(0, 0, maxWidth * xCell - 1, maxHeight * yCell - 1)
+    invalid.court = false
   }
 }
 
-
-// function drawCourt() {
-//   if (invalid.court) {
-//     ctx.clearRect(0, 0, canvas.width, canvas.height);
-//     if (playing)
-//       drawPiece(ctx, current.type, current.x, current.y, current.dir);
-//     var x, y, block;
-//     for(y = 0 ; y < ny ; y++) {
-//       for (x = 0 ; x < nx ; x++) {
-//         if (block = getBlock(x,y))
-//           drawBlock(ctx, x, y, block.color);
-//       }
-//     }
-//     ctx.strokeRect(0, 0, nx*dx - 1, ny*dy - 1); // court boundary
-//     invalid.court = false;
-//   }
-// }
-
-// function draw() {
-//   ctx.save();
-//   ctx.lineWidth = 1;
-//   ctx.translate(0.5, 0.5); // for crisp 1px black lines
-//   drawCourt();
-//   drawNext();
-//   drawScore();
-//   drawRows();
-//   ctx.restore();
-// }
-//
-// function drawNext() {
-//   if (invalid.next) {
-//     var padding = (nu - next.type.size) / 2; // half-arsed attempt at centering next piece display
-//     uctx.save();
-//     uctx.translate(0.5, 0.5);
-//     uctx.clearRect(0, 0, nu*dx, nu*dy);
-//     drawPiece(uctx, next.type, padding, padding, next.dir);
-//     uctx.strokeStyle = 'black';
-//     uctx.strokeRect(0, 0, nu*dx - 1, nu*dy - 1);
-//     uctx.restore();
-//     invalid.next = false;
-//   }
-// }
-// function drawScore() {
-//   if (invalid.score) {
-//     html('score', ("00000" + Math.floor(vscore)).slice(-5));
-//     invalid.score = false;
-//   }
-// }
+function draw() {
+  ctx.save()
+  ctx.lineWidth = 1;
+  ctx.translate(10, 10);
+  drawTetromino(ctx, jTet, 10, 10, 0)
+  drawCourt()
+  ctx.restore()
+}
 
 //  Creating a score global variable and validation checker.
 function setScore(num) {
@@ -318,7 +290,7 @@ function addRows(num) {
 }
 
 function occupiedFlag(x, y){
-  if (cells && cells[x]){
+  if (cells && blocks[x]){
     return cells[x][y]
   } else {
     return null;
@@ -326,8 +298,8 @@ function occupiedFlag(x, y){
 }
 
 function setTetromino(x, y, tetromino) {
-  cells[x] = cells[x] || [];
-  cells [x][y] = tetromino;
+  blocks[x] = blocks[x] || [];
+  blocks[x][y] = tetromino;
   invalidate();
 }
 
@@ -336,21 +308,95 @@ function setCurrentTetromino(tetromino) {
   invalidate();
 }
 
-function setNextPiece(tetromino) {
-  nextTet = tetromino || tetArr[nextPiece]
-  invalidateNext();
-}
+// function setNextTetromino(tetromino) {
+//   nextTet = tetromino || tetArr[nextPiece]
+//   invalidateNext();
+// }
 
 function timestamp() {
   return new Date().getTime()
 }
+
+//  Function to validate movement of tetromino in current position.  This function checks if the piece can currently move left right and down.
+function movement(direction) {
+  var x = currentTet.x      // captures current x position of tetromino.
+  var y = currentTet.y      // ditto for y.
+  switch (direction) {
+    case DIRECTIONS.RIGHT:  // If tetromino wants to move right ...
+      x += 1;               // then move on x array 1 to the right.
+      break;
+    case DIRECTIONS.LEFT:   // If tetromino wants to move left ...
+      x -= 1;               // then move on x array 1 to the left.
+      break;
+    case DIRECTIONS.DOWN:   // If tetromino is moving down ...
+      y += 1;               // do so by increasing y row value by 1.
+      break;                // the coordinate system is an inversed y going down.
+  }
+  // After movement is determined, a check must be performed if the move is valid.
+  if (unoccupiedCheck(currentTet.tetromino, x, y, currentTet.direction)) {
+    currentTet.x = x;   // sets value of currentTet to new position for check.
+    currentTet.y = y;   // ditto for y-value.
+    invalidateBoard();  // sets the invalidateBoard flag to true.
+    return true;        // returning the true tag for piece check.
+  } else {
+    return false;       // a false flag means the new position was occupied.
+  }
+}
+
+//  Function for handling rotation by cyceling through DIRECTIONS object.
+function rotation() {
+  //  The DIRECTIONS object has a set value of directions from 0 to 3. Once a
+  //  piece has been rotated 3 times then this variable will loop through from,
+  //  (LEFT === 3 == MAX) to (UP === 0 == MIN)
+  var newRotationDirection = (currentTet.directionIndex == DIRECTIONS.MAX ? DIRECTIONS.MIN : currentTet.directionIndex + 1);
+  //  after rotation we must check if the new position is valid before redrawing.
+  if (unoccupiedCheck(currentTet.tetromino, currentTet.x, currentTet.y, newRotationDirection)) {
+    currentTet.directionIndex = newRotationDirection
+    invalidateBoard();  // Resetting the invalidate object board true flag.
+  }
+}
+
+//  This is used to determin if a tetromino can drop 'current.y + 1' value down.
+function dropTetromino() {
+  //  This checks the boards current tetromino position.
+  tetCellCheck(currentTet.tetromino, currentTet.x, currentTet.y, currentTet.directionIndex, function(x, y) {
+    // Inside this anonymous function we check the tetromino's drop is valid to the board by calling the setTetromino function.
+    setTetromino(x, y, currentTet.tetromino)
+  })
+}
+
+function softDrop() {
+  if (!move(DIRECTIONS.DOWN)) {   // If the tetromino can no longer move down ...
+    dropTetromino();  // Run the function to move the tetromino down by y + 1.
+    setCurrentTetromino(randomPiece())
+    if (occupiedCheck(currentTet.tetromino, currentTet.x, currentTet.y, current.directionIndex))
+  }
+}
+
+//  Function which handles the movement from the arrow keystrokes.
+function keyPressHandeler(keystroke)
+  switch (keystroke) {
+    case DIRECTIONS.LEFT:
+      move(DIRECTIONS.LEFT);
+      break;
+    case DIRECTIONS.RIGHT:
+      move(DIRECTIONS.RIGHT);
+      break;
+    case DIRECTIONS.DOWN:
+      softDrop();
+      break;
+    case DIRECTIONS.UP:
+      rotation();
+      break;
+  }
+
 
 function startGame() {
 
   var last = now = timestamp()
   function frame() {
     now = timestamp();
-    update((now - last) / 1000.0);
+    // update((now - last) / 1000.0);
     draw();
     last = now;
     requestAnimationFrame(frame, canvas);
@@ -360,6 +406,7 @@ function startGame() {
 
 }
 
+startGame()
 
 
 
